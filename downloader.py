@@ -37,8 +37,14 @@ def get_ffmpeg_location():
             ffmpeg = os.path.join(base_path, 'ffmpeg')
         else:
             ffmpeg = os.path.join(base_path, 'ffmpeg.exe')
+        print(f"[DEBUG] FFmpeg 경로 확인: {ffmpeg}")
+        print(f"[DEBUG] FFmpeg 존재 여부: {os.path.exists(ffmpeg)}")
         if os.path.exists(ffmpeg):
+            print(f"[DEBUG] FFmpeg 디렉토리: {base_path}")
             return base_path  # 디렉토리 경로 반환
+        else:
+            # 번들 디렉토리 내용 출력
+            print(f"[DEBUG] 번들 디렉토리 내용: {os.listdir(base_path)[:20]}")
     return None  # 시스템 ffmpeg 사용 (PATH에서 찾음)
 
 
