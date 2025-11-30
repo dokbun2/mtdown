@@ -81,7 +81,7 @@ jobs:
           $ffmpegPath = (Get-Command ffmpeg).Source
           $ffprobePath = (Get-Command ffprobe).Source
 
-          pyinstaller --onefile --windowed `
+          pyinstaller --onefile --console `
             --name "MTDown" `
             --add-data "downloader.py;." `
             --add-binary "$ffmpegPath;." `
