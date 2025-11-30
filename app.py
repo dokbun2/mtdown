@@ -263,6 +263,12 @@ class YouTubeDownloaderApp(ctk.CTk):
             messagebox.showerror("오류", "지원하지 않는 URL입니다.\n(YouTube, Instagram, Threads, Aikive 지원)")
             return
 
+        # macOS 패키징 앱에서 Aikive/Threads 지원 불가 (Chromium 번들 불가)
+        if getattr(sys, 'frozen', False) and sys.platform == 'darwin':
+            if ('aikive.com' in url or 'threads.net' in url or 'threads.com' in url):
+                messagebox.showwarning("안내", "macOS 앱에서는 Aikive/Threads가 지원되지 않습니다.\n\nYouTube, Instagram URL만 지원됩니다.")
+                return
+
         # 저장 경로 검증
         if not os.path.isdir(save_path):
             messagebox.showerror("오류", "유효한 저장 경로를 선택해주세요.")
