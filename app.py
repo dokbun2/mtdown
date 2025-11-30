@@ -260,14 +260,8 @@ class YouTubeDownloaderApp(ctk.CTk):
             return
 
         if not self.downloader.validate_url(url):
-            messagebox.showerror("오류", "지원하지 않는 URL입니다.\n(YouTube, Instagram 지원)")
+            messagebox.showerror("오류", "지원하지 않는 URL입니다.\n(YouTube, Instagram, Threads, Aikive 지원)")
             return
-
-        # 패키징 앱에서 Aikive/Threads 지원 불가 안내
-        if getattr(sys, 'frozen', False):
-            if ('aikive.com' in url or 'threads.net' in url or 'threads.com' in url):
-                messagebox.showwarning("안내", "Aikive/Threads는 패키징 앱에서 지원되지 않습니다.\n(브라우저 엔진이 필요합니다)\n\nYouTube, Instagram URL만 지원됩니다.")
-                return
 
         # 저장 경로 검증
         if not os.path.isdir(save_path):

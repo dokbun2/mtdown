@@ -42,6 +42,17 @@ def get_ffmpeg_location():
     return None  # 시스템 ffmpeg 사용 (PATH에서 찾음)
 
 
+def setup_playwright_path():
+    """번들된 Playwright 브라우저 경로 설정"""
+    if getattr(sys, 'frozen', False):
+        base_path = sys._MEIPASS
+        playwright_path = os.path.join(base_path, 'ms-playwright')
+        if os.path.exists(playwright_path):
+            os.environ['PLAYWRIGHT_BROWSERS_PATH'] = playwright_path
+            return True
+    return False
+
+
 class YouTubeDownloader:
     """YouTube/Instagram 영상/음원 다운로드 클래스 (yt-dlp 지원 사이트)"""
 
@@ -193,6 +204,9 @@ class AikiveDownloader:
 
     def _extract_video_url(self, url: str, progress_callback=None) -> Optional[tuple]:
         """Playwright로 비디오 URL 및 제목 추출"""
+        # 번들된 Playwright 브라우저 경로 설정
+        setup_playwright_path()
+
         try:
             from playwright.sync_api import sync_playwright
         except ImportError:
@@ -389,6 +403,9 @@ class ThreadsDownloader:
 
     def _extract_video_url(self, url: str, progress_callback=None) -> Optional[tuple]:
         """Playwright로 비디오 URL 및 제목 추출"""
+        # 번들된 Playwright 브라우저 경로 설정
+        setup_playwright_path()
+
         try:
             from playwright.sync_api import sync_playwright
         except ImportError:
