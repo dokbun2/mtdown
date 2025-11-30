@@ -8,7 +8,7 @@ import yt_dlp
 
 
 def get_ffmpeg_path():
-    """번들된 ffmpeg 경로 또는 시스템 ffmpeg 반환"""
+    """번들된 ffmpeg 경로 또는 시스템 ffmpeg 반환 (실행파일 경로)"""
     if getattr(sys, 'frozen', False):
         # PyInstaller로 패키징된 경우
         base_path = sys._MEIPASS
@@ -19,6 +19,20 @@ def get_ffmpeg_path():
         if os.path.exists(ffmpeg):
             return ffmpeg
     return 'ffmpeg'  # 시스템 ffmpeg 사용
+
+
+def get_ffmpeg_location():
+    """yt-dlp용 ffmpeg 디렉토리 경로 반환"""
+    if getattr(sys, 'frozen', False):
+        # PyInstaller로 패키징된 경우 - 번들 디렉토리 반환
+        base_path = sys._MEIPASS
+        if sys.platform == 'darwin':
+            ffmpeg = os.path.join(base_path, 'ffmpeg')
+        else:
+            ffmpeg = os.path.join(base_path, 'ffmpeg.exe')
+        if os.path.exists(ffmpeg):
+            return base_path  # 디렉토리 경로 반환
+    return None  # 시스템 ffmpeg 사용 (PATH에서 찾음)
 
 
 class YouTubeDownloader:
@@ -70,8 +84,11 @@ class YouTubeDownloader:
             'progress_hooks': [progress_hook],
             'merge_output_format': 'mp4',
             'nocheckcertificate': True,
-            'ffmpeg_location': get_ffmpeg_path(),
         }
+        # 번들된 ffmpeg가 있으면 경로 지정
+        ffmpeg_loc = get_ffmpeg_location()
+        if ffmpeg_loc:
+            ydl_opts['ffmpeg_location'] = ffmpeg_loc
 
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -118,8 +135,11 @@ class YouTubeDownloader:
                 'preferredquality': '320',
             }],
             'nocheckcertificate': True,
-            'ffmpeg_location': get_ffmpeg_path(),
         }
+        # 번들된 ffmpeg가 있으면 경로 지정
+        ffmpeg_loc = get_ffmpeg_location()
+        if ffmpeg_loc:
+            ydl_opts['ffmpeg_location'] = ffmpeg_loc
 
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
