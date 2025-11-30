@@ -3,6 +3,8 @@ import re
 import os
 import sys
 import subprocess
+import ssl
+import certifi
 from typing import Callable, Optional
 import yt_dlp
 
@@ -84,11 +86,18 @@ class YouTubeDownloader:
             'progress_hooks': [progress_hook],
             'merge_output_format': 'mp4',
             'nocheckcertificate': True,
+            'no_check_certificate': True,
         }
         # 번들된 ffmpeg가 있으면 경로 지정
         ffmpeg_loc = get_ffmpeg_location()
         if ffmpeg_loc:
             ydl_opts['ffmpeg_location'] = ffmpeg_loc
+        # SSL 인증서 경로 설정 (Windows 패키징 앱용)
+        try:
+            os.environ['SSL_CERT_FILE'] = certifi.where()
+            os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
+        except:
+            pass
 
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -135,11 +144,18 @@ class YouTubeDownloader:
                 'preferredquality': '320',
             }],
             'nocheckcertificate': True,
+            'no_check_certificate': True,
         }
         # 번들된 ffmpeg가 있으면 경로 지정
         ffmpeg_loc = get_ffmpeg_location()
         if ffmpeg_loc:
             ydl_opts['ffmpeg_location'] = ffmpeg_loc
+        # SSL 인증서 경로 설정 (Windows 패키징 앱용)
+        try:
+            os.environ['SSL_CERT_FILE'] = certifi.where()
+            os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
+        except:
+            pass
 
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:

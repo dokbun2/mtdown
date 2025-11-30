@@ -21,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install customtkinter yt-dlp pyinstaller
+          pip install customtkinter yt-dlp pyinstaller certifi
           brew install ffmpeg
 
       - name: Build macOS app (Universal)
@@ -36,6 +36,8 @@ jobs:
             --add-binary "$FFMPEG_PATH:." \
             --add-binary "$FFPROBE_PATH:." \
             --hidden-import "yt_dlp" \
+            --hidden-import "certifi" \
+            --collect-data "certifi" \
             --target-architecture x86_64 \
             app.py
 
@@ -68,7 +70,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install customtkinter yt-dlp pyinstaller
+          pip install customtkinter yt-dlp pyinstaller certifi
 
       - name: Install FFmpeg
         run: |
@@ -85,6 +87,8 @@ jobs:
             --add-binary "$ffmpegPath;." `
             --add-binary "$ffprobePath;." `
             --hidden-import "yt_dlp" `
+            --hidden-import "certifi" `
+            --collect-data "certifi" `
             app.py
 
       - name: Upload Windows artifact
