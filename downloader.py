@@ -3,10 +3,15 @@ import re
 import os
 import sys
 import subprocess
-import ssl
-import certifi
 from typing import Callable, Optional
 import yt_dlp
+
+# certifi는 optional (패키징 앱에서만 필요)
+try:
+    import certifi
+    HAS_CERTIFI = True
+except ImportError:
+    HAS_CERTIFI = False
 
 
 def get_ffmpeg_path():
@@ -92,12 +97,13 @@ class YouTubeDownloader:
         ffmpeg_loc = get_ffmpeg_location()
         if ffmpeg_loc:
             ydl_opts['ffmpeg_location'] = ffmpeg_loc
-        # SSL 인증서 경로 설정 (Windows 패키징 앱용)
-        try:
-            os.environ['SSL_CERT_FILE'] = certifi.where()
-            os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
-        except:
-            pass
+        # SSL 인증서 경로 설정 (패키징 앱용)
+        if HAS_CERTIFI:
+            try:
+                os.environ['SSL_CERT_FILE'] = certifi.where()
+                os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
+            except:
+                pass
 
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -150,12 +156,13 @@ class YouTubeDownloader:
         ffmpeg_loc = get_ffmpeg_location()
         if ffmpeg_loc:
             ydl_opts['ffmpeg_location'] = ffmpeg_loc
-        # SSL 인증서 경로 설정 (Windows 패키징 앱용)
-        try:
-            os.environ['SSL_CERT_FILE'] = certifi.where()
-            os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
-        except:
-            pass
+        # SSL 인증서 경로 설정 (패키징 앱용)
+        if HAS_CERTIFI:
+            try:
+                os.environ['SSL_CERT_FILE'] = certifi.where()
+                os.environ['REQUESTS_CA_BUNDLE'] = certifi.where()
+            except:
+                pass
 
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
