@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-macos:
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,27 +23,28 @@ jobs:
           python -m pip install --upgrade pip
           pip install customtkinter yt-dlp pyinstaller
 
-      - name: Build macOS app
+      - name: Build macOS app (Universal)
         run: |
           pyinstaller --onefile --windowed \
-            --name "YouTube Downloader" \
+            --name "MTDown" \
             --add-data "downloader.py:." \
+            --target-architecture x86_64 \
             app.py
 
       - name: Create DMG
         run: |
           mkdir -p dist/dmg
-          cp -r "dist/YouTube Downloader.app" dist/dmg/
-          hdiutil create -volname "YouTube Downloader" \
+          cp -r "dist/MTDown.app" dist/dmg/
+          hdiutil create -volname "MTDown" \
             -srcfolder dist/dmg \
             -ov -format UDZO \
-            "dist/YouTube-Downloader-macOS.dmg"
+            "dist/MTDown-macOS.dmg"
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: macos-build
-          path: dist/YouTube-Downloader-macOS.dmg
+          path: dist/MTDown-macOS.dmg
 
   build-windows:
     runs-on: windows-latest
@@ -64,19 +65,15 @@ jobs:
       - name: Build Windows exe
         run: |
           pyinstaller --onefile --windowed `
-            --name "YouTube Downloader" `
+            --name "MTDown" `
             --add-data "downloader.py;." `
             app.py
-
-      - name: Rename output
-        run: |
-          mv "dist/YouTube Downloader.exe" "dist/YouTube-Downloader-Windows.exe"
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-build
-          path: dist/YouTube-Downloader-Windows.exe
+          path: dist/MTDown.exe
 
   release:
     needs: [build-macos, build-windows]
@@ -94,8 +91,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifacts/macos-build/YouTube-Downloader-macOS.dmg
-            artifacts/windows-build/YouTube-Downloader-Windows.exe
+            artifacts/macos-build/MTDown-macOS.dmg
+            artifacts/windows-build/MTDown.exe
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
