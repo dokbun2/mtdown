@@ -22,12 +22,20 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install customtkinter yt-dlp pyinstaller
+          brew install ffmpeg
 
       - name: Build macOS app (Universal)
         run: |
+          # FFmpeg 경로 찾기
+          FFMPEG_PATH=$(which ffmpeg)
+          FFPROBE_PATH=$(which ffprobe)
+
           pyinstaller --onefile --windowed \
             --name "MTDown" \
             --add-data "downloader.py:." \
+            --add-binary "$FFMPEG_PATH:." \
+            --add-binary "$FFPROBE_PATH:." \
+            --hidden-import "yt_dlp" \
             --target-architecture x86_64 \
             app.py
 
@@ -62,11 +70,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install customtkinter yt-dlp pyinstaller
 
+      - name: Install FFmpeg
+        run: |
+          choco install ffmpeg -y
+
       - name: Build Windows exe
         run: |
+          $ffmpegPath = (Get-Command ffmpeg).Source
+          $ffprobePath = (Get-Command ffprobe).Source
+
           pyinstaller --onefile --windowed `
             --name "MTDown" `
             --add-data "downloader.py;." `
+            --add-binary "$ffmpegPath;." `
+            --add-binary "$ffprobePath;." `
+            --hidden-import "yt_dlp" `
             app.py
 
       - name: Upload Windows artifact

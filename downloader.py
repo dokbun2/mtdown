@@ -1,9 +1,24 @@
 """YouTube 및 Aikive 다운로드 로직 모듈"""
 import re
 import os
+import sys
 import subprocess
 from typing import Callable, Optional
 import yt_dlp
+
+
+def get_ffmpeg_path():
+    """번들된 ffmpeg 경로 또는 시스템 ffmpeg 반환"""
+    if getattr(sys, 'frozen', False):
+        # PyInstaller로 패키징된 경우
+        base_path = sys._MEIPASS
+        if sys.platform == 'darwin':
+            ffmpeg = os.path.join(base_path, 'ffmpeg')
+        else:
+            ffmpeg = os.path.join(base_path, 'ffmpeg.exe')
+        if os.path.exists(ffmpeg):
+            return ffmpeg
+    return 'ffmpeg'  # 시스템 ffmpeg 사용
 
 
 class YouTubeDownloader:
@@ -55,6 +70,7 @@ class YouTubeDownloader:
             'progress_hooks': [progress_hook],
             'merge_output_format': 'mp4',
             'nocheckcertificate': True,
+            'ffmpeg_location': get_ffmpeg_path(),
         }
 
         try:
@@ -102,6 +118,7 @@ class YouTubeDownloader:
                 'preferredquality': '320',
             }],
             'nocheckcertificate': True,
+            'ffmpeg_location': get_ffmpeg_path(),
         }
 
         try:
@@ -210,7 +227,7 @@ class AikiveDownloader:
 
         # FFmpeg로 m3u8 다운로드
         cmd = [
-            'ffmpeg', '-y',
+            get_ffmpeg_path(), '-y',
             '-i', m3u8_url,
             '-c', 'copy',
             '-bsf:a', 'aac_adtstoasc',
@@ -274,7 +291,7 @@ class AikiveDownloader:
 
         # FFmpeg로 오디오만 추출
         cmd = [
-            'ffmpeg', '-y',
+            get_ffmpeg_path(), '-y',
             '-i', m3u8_url,
             '-vn',
             '-acodec', 'libmp3lame',
@@ -406,7 +423,7 @@ class ThreadsDownloader:
 
         # FFmpeg로 다운로드
         cmd = [
-            'ffmpeg', '-y',
+            get_ffmpeg_path(), '-y',
             '-i', video_url,
             '-c', 'copy',
             output_file
@@ -467,7 +484,7 @@ class ThreadsDownloader:
         output_file = os.path.join(output_path, f"{title}.mp3")
 
         cmd = [
-            'ffmpeg', '-y',
+            get_ffmpeg_path(), '-y',
             '-i', video_url,
             '-vn',
             '-acodec', 'libmp3lame',
